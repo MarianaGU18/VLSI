@@ -1,0 +1,82 @@
+library ieee;
+use ieee.std_logic_1164_all;
+
+entity main is
+	port(
+	-- Reloj
+		clk : in std_logic_vector(6 downto 0);
+		
+	-- Salidas a cada display
+		ssg3 : out std_logic_vector(6 downto 0);
+		ssg2 : out std_logic_vector(6 downto 0);
+		ssg1 : out std_logic_vector(6 downto 0);
+		ssg0 : out std_logic_vector(6 downto 0);
+		carry : out std_logic
+	);
+end entity;
+
+architecture arquimain of main is
+
+-- Reloj para el contador
+	signal clkl 														: std_logic := '0';
+	
+--Señales para cada uno de los digitos
+	signal count1, count2, count3, count4  	            : integer := '0';
+
+--Señales para cada una de las banderas 
+signal flag1, flag2, flag3, flag4                        : std_logic := '0';
+
+
+-- Señal reset
+signal rest																: std_logic := '0';		
+
+
+
+begin
+
+-- Entidad del divisor de frecuencia
+
+	u1: entity work.divfreq(rt1) port map (clk, clk1);
+
+-- Entidad para cada uno de los contadores
+		
+		c1 :entity work.cont(arqcont) -- Unidades segundos
+		generic map(max_count => 9)
+		port map (clkl, max_cunt1, rest, flag1);
+		
+		c2 :entity work.cont(arqcont) -- Unidades segundos
+		generic map(max_count => 9)
+		port map (clkl, max_cunt1, rest, flag2);
+		
+		c3 :entity work.cont(arqcont) -- Unidades segundos
+		generic map(max_count => 9)
+		port map (clkl, max_cunt1, rest, flag3);
+		
+		
+		c4 :entity work.cont(arqcont) -- Unidades segundos
+		generic map(max_count => 9)
+		port map (clkl, max_cunt1, rest, flag4);
+
+		
+		
+		-- Salidas para cada display
+		dis1 : entity work.ss7(arqss7) port map(count1, ssg0);
+		dis2 : entity work.ss7(arqss7) port map(count2, ssg1);	
+		dis3 : entity work.ss7(arqss7) port map(count3, ssg2);
+		dis4 : entity work.ss7(arqss7) port map(count4, ssg3);
+
+	-- Proceso para verificar cuando llegue a 23:59, se considera cuando el contador de las decenas llega a 2 y el de las unidades a 4 para ser reiniciado.
+process(clk, rest)
+
+		begin 
+			if rising_edge(clk) then
+				if count4 = 2 and count 3 = 4 then
+					rest <= '1';
+				else
+					rest <= '0';
+				end if;
+			end if;
+end process;
+
+
+end architecture;
